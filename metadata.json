@@ -1,0 +1,6 @@
+{
+  "name": "Nusantara Port & Vessel Manifest - Sistem Muatan & Penumpang Kapal",
+  "description": "Sistem manajemen operasional muatan kargo dan manifest penumpang kapal laut terintegrasi dengan Firebase database persisten real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

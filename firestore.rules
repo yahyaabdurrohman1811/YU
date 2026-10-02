@@ -1,0 +1,102 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Health check endpoint
+    match /test/{testId} {
+      allow get: if true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Ship validation helper
+    function isValidShip(data) {
+      return data.name is string && data.name.size() >= 2 && data.name.size() <= 100
+        && data.code is string && data.code.size() >= 3 && data.code.size() <= 30
+        && data.type is string && data.type.size() <= 50
+        && data.capacityPassengers is number && data.capacityPassengers >= 0
+        && data.capacityCargoTons is number && data.capacityCargoTons >= 0
+        && data.captainName is string && data.captainName.size() >= 2 && data.captainName.size() <= 100
+        && data.status is string && data.status.size() <= 50;
+    }
+
+    // Voyage validation helper
+    function isValidVoyage(data) {
+      return data.shipName is string && data.shipName.size() >= 2 && data.shipName.size() <= 100
+        && data.voyageNumber is string && data.voyageNumber.size() >= 3 && data.voyageNumber.size() <= 50
+        && data.originPort is string && data.originPort.size() >= 2 && data.originPort.size() <= 100
+        && data.destinationPort is string && data.destinationPort.size() >= 2 && data.destinationPort.size() <= 100
+        && data.departureTime is string && data.departureTime.size() <= 60
+        && data.arrivalTime is string && data.arrivalTime.size() <= 60
+        && data.status is string && data.status.size() <= 50;
+    }
+
+    // Passenger validation helper
+    function isValidPassenger(data) {
+      return data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100
+        && data.ticketNumber is string && data.ticketNumber.size() >= 3 && data.ticketNumber.size() <= 50
+        && data.identityNumber is string && data.identityNumber.size() >= 6 && data.identityNumber.size() <= 30
+        && data.gender is string && (data.gender == 'Laki-laki' || data.gender == 'Perempuan')
+        && data.ticketClass is string && data.ticketClass.size() <= 40
+        && data.seatCabinNumber is string && data.seatCabinNumber.size() >= 1 && data.seatCabinNumber.size() <= 30
+        && data.checkInStatus is string && data.checkInStatus.size() <= 40;
+    }
+
+    // Cargo validation helper
+    function isValidCargo(data) {
+      return data.manifestNumber is string && data.manifestNumber.size() >= 3 && data.manifestNumber.size() <= 50
+        && data.senderName is string && data.senderName.size() >= 2 && data.senderName.size() <= 100
+        && data.receiverName is string && data.receiverName.size() >= 2 && data.receiverName.size() <= 100
+        && data.cargoCategory is string && data.cargoCategory.size() <= 50
+        && data.description is string && data.description.size() >= 2 && data.description.size() <= 250
+        && data.weightKg is number && data.weightKg >= 0
+        && data.deckLocation is string && data.deckLocation.size() >= 1 && data.deckLocation.size() <= 50
+        && data.status is string && data.status.size() <= 50;
+    }
+
+    match /ships/{shipId} {
+      allow read: if true;
+      allow create, update: if isValidId(shipId) && isValidShip(request.resource.data);
+      allow delete: if isValidId(shipId);
+    }
+
+    match /voyages/{voyageId} {
+      allow read: if true;
+      allow create, update: if isValidId(voyageId) && isValidVoyage(request.resource.data);
+      allow delete: if isValidId(voyageId);
+    }
+
+    match /passengers/{passengerId} {
+      allow read: if true;
+      allow create, update: if isValidId(passengerId) && isValidPassenger(request.resource.data);
+      allow delete: if isValidId(passengerId);
+    }
+
+    match /cargos/{cargoId} {
+      allow read: if true;
+      allow create, update: if isValidId(cargoId) && isValidCargo(request.resource.data);
+      allow delete: if isValidId(cargoId);
+    }
+
+    match /system_users/{userId} {
+      allow read: if true;
+      allow create, update: if isValidId(userId);
+      allow delete: if isValidId(userId);
+    }
+
+    match /active_sessions/{sessionId} {
+      allow read: if true;
+      allow create, update, delete: if isValidId(sessionId);
+    }
+  }
+}

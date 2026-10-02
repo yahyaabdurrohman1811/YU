@@ -1,0 +1,142 @@
+{
+  "entities": {
+    "Ship": {
+      "title": "Ship",
+      "description": "Informasi armada kapal laut beserta spesifikasi teknis dan nakhoda",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "code": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "type": { "type": "string", "enum": ["Kapal Feri Ro-Ro", "Kapal Penumpang (Pelni)", "Kapal Kargo Kontainer", "Kapal Cepat Express"] },
+        "capacityPassengers": { "type": "number" },
+        "capacityCargoTons": { "type": "number" },
+        "captainName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "status": { "type": "string", "enum": ["Bersandar (Berthing)", "Bongkar Muat (Loading/Unloading)", "Berlayar (Sailing)", "Perawatan (Maintenance)"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["name", "code", "type", "capacityPassengers", "capacityCargoTons", "captainName", "status"]
+    },
+    "Voyage": {
+      "title": "Voyage",
+      "description": "Jadwal pelayaran kapal dan rute penyeberangan",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shipId": { "type": "string" },
+        "shipName": { "type": "string" },
+        "voyageNumber": { "type": "string", "minLength": 3, "maxLength": 50 },
+        "originPort": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "destinationPort": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "departureTime": { "type": "string" },
+        "arrivalTime": { "type": "string" },
+        "status": { "type": "string", "enum": ["Jadwal", "Boarding", "Berlayar", "Tiba", "Selesai"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["shipName", "voyageNumber", "originPort", "destinationPort", "departureTime", "arrivalTime", "status"]
+    },
+    "Passenger": {
+      "title": "Passenger",
+      "description": "Manifest data penumpang kapal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "voyageId": { "type": "string" },
+        "shipName": { "type": "string" },
+        "ticketNumber": { "type": "string", "minLength": 3, "maxLength": 50 },
+        "fullName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "identityNumber": { "type": "string", "minLength": 6, "maxLength": 30 },
+        "gender": { "type": "string", "enum": ["Laki-laki", "Perempuan"] },
+        "age": { "type": "number" },
+        "ticketClass": { "type": "string", "enum": ["Ekonomi", "Bisnis", "VIP / Kelas 1"] },
+        "seatCabinNumber": { "type": "string", "minLength": 1, "maxLength": 30 },
+        "destinationPort": { "type": "string" },
+        "baggageWeightKg": { "type": "number" },
+        "checkInStatus": { "type": "string", "enum": ["Terdaftar", "Boarding / Sudah Naik", "Batal"] },
+        "contactPhone": { "type": "string", "minLength": 5, "maxLength": 25 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["ticketNumber", "fullName", "identityNumber", "gender", "age", "ticketClass", "seatCabinNumber", "checkInStatus"]
+    },
+    "Cargo": {
+      "title": "Cargo",
+      "description": "Manifest muatan logistik, barang dan kendaraan di kapal",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "voyageId": { "type": "string" },
+        "shipName": { "type": "string" },
+        "manifestNumber": { "type": "string", "minLength": 3, "maxLength": 50 },
+        "senderName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "receiverName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "cargoCategory": { "type": "string", "enum": ["Kendaraan Roda 2", "Kendaraan Roda 4 (Mobil Pribadi)", "Truk / Alat Berat", "Kontainer 20ft", "Kontainer 40ft", "Kargo Umum (General Cargo)", "Bahan Pokok / Logistik Dingin"] },
+        "description": { "type": "string", "minLength": 2, "maxLength": 250 },
+        "weightKg": { "type": "number" },
+        "volumeM3": { "type": "number" },
+        "hazardous": { "type": "boolean" },
+        "deckLocation": { "type": "string", "minLength": 1, "maxLength": 50 },
+        "vehiclePlateNumber": { "type": "string", "maxLength": 30 },
+        "status": { "type": "string", "enum": ["Menunggu Muat", "Termuat di Kapal", "Selesai Bongkar"] },
+        "notes": { "type": "string", "maxLength": 200 },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["manifestNumber", "senderName", "receiverName", "cargoCategory", "description", "weightKg", "deckLocation", "status"]
+    },
+    "SystemUser": {
+      "title": "SystemUser",
+      "description": "Data kredensial pengguna dan administrator pelabuhan",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string" },
+        "password": { "type": "string" },
+        "roleTitle": { "type": "string" }
+      },
+      "required": ["email", "displayName", "role"]
+    },
+    "ActiveSession": {
+      "title": "ActiveSession",
+      "description": "Sesi aktif pengguna di database Firestore",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "role": { "type": "string" },
+        "loginAt": { "type": "string" }
+      },
+      "required": ["uid", "email", "role"]
+    }
+  },
+  "firestore": {
+    "/ships/{shipId}": {
+      "schema": { "$ref": "#/entities/Ship" },
+      "description": "Koleksi data armada kapal laut"
+    },
+    "/voyages/{voyageId}": {
+      "schema": { "$ref": "#/entities/Voyage" },
+      "description": "Koleksi jadwal rute pelayaran kapal"
+    },
+    "/passengers/{passengerId}": {
+      "schema": { "$ref": "#/entities/Passenger" },
+      "description": "Koleksi data manifest penumpang kapal"
+    },
+    "/cargos/{cargoId}": {
+      "schema": { "$ref": "#/entities/Cargo" },
+      "description": "Koleksi data manifest muatan barang kargo dan kendaraan"
+    },
+    "/system_users/{userId}": {
+      "schema": { "$ref": "#/entities/SystemUser" },
+      "description": "Koleksi data akun administrator dan staf pelabuhan"
+    },
+    "/active_sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/ActiveSession" },
+      "description": "Koleksi sesi aktif pengguna di Firebase"
+    }
+  }
+}
